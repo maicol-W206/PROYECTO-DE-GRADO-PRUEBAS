@@ -1,0 +1,149 @@
+.section,
+.container {
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+.section {
+  min-height: auto;
+  background: rgb(29, 30, 87);
+  padding: var(--padding-96) var(--padding-32) var(--padding-0);
+  text-align: center;
+  font-size: var(--fs-36);
+  color: var(--color-white);
+  font-family: var(--font-inter);
+  gap: var(--gap-32);
+}
+.container {
+  width: min(900px, 100%);
+  padding: 0 var(--padding-24);
+  gap: var(--gap-32);
+}
+.assistantPanel {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-24);
+}
+.heading2 {
+  width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+}
+.listoParaEncontrar {
+  margin: 0;
+  width: auto;
+  max-width: 100%;
+  font-size: inherit;
+  line-height: var(--lh-40);
+  font-weight: 700;
+  font-family: inherit;
+  display: inline-flex;
+  text-align: center;
+  justify-content: center;
+}
+.paragraph {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-20);
+  color: var(--color-lavender);
+}
+.nuestroAsistenteInteligente {
+  width: 100%;
+  max-width: 760px;
+  font-size: var(--fs-18);
+  color: var(--color-lavender);
+  line-height: var(--lh-28);
+}
+.assistantAction {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+}
+.iconWrapper,
+.link {
+  display: flex;
+  align-items: center;
+}
+.link {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-14) var(--padding-20) var(--padding-18) var(--padding-20);
+  background-color: var(--color-white);
+  border-radius: var(--br-10);
+  gap: 6.8px;
+}
+.iconWrapper {
+  flex-direction: column;
+  padding: var(--padding-4) var(--padding-0) var(--padding-0);
+}
+.comenzarBsqueda {
+  align-items: center;
+  justify-content: center;
+  height: var(--height-24);
+  width: auto;
+  min-width: 120px;
+  position: relative;
+  font-size: var(--fs-16);
+  line-height: var(--lh-24);
+  display: inline-flex;
+  font-family: var(--font-inter);
+  color: var(--color-royalblue-100);
+  text-align: center;
+}
+@media screen and (max-width: 1200px) {
+  .section {
+    padding-left: var(--padding-40);
+    padding-right: var(--padding-40);
+  }
+}
+@media screen and (max-width: 825px) {
+  .section {
+    padding-left: var(--padding-40);
+    padding-right: var(--padding-40);
+  }
+  .listoParaEncontrar {
+    font-size: 29px;
+    line-height: var(--lh-32);
+  }
+}
+@media screen and (max-width: 450px) {
+  .section {
+    padding-left: var(--padding-20);
+    padding-right: var(--padding-20);
+  }
+  .container {
+    gap: var(--gap-16);
+  }
+  .listoParaEncontrar {
+    font-size: var(--fs-22);
+    line-height: var(--lh-24);
+  }
+  .nuestroAsistenteInteligente {
+    font-size: var(--fs-16);
+    line-height: var(--lh-22);
+  }
+  .link {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 320px) {
+  .section {
+    padding-left: var(--padding-10);
+    padding-right: var(--padding-10);
+  }
+  .container {
+    padding: 0;
+  }
+}

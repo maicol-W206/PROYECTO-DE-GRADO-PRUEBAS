@@ -1,0 +1,120 @@
+.headerEncontrarpieza {
+  width: 100%;
+  background-color: #ffffff;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  padding: 24px 32px;
+  font-family: var(--font-inter);
+}
+.container {
+  width: min(1200px, 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.containerIcon {
+  height: 48px;
+  width: 48px;
+  border-radius: 14px;
+  background: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.containerIcon img {
+  width: 22px;
+  height: 22px;
+}
+.container2 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.heading1 {
+  margin: 0;
+}
+.metalMecnicaEl {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.paragraph {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+}
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+  color: #475569;
+}
+.link2,
+.link3,
+.link4 {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.inicio,
+.encontrarPieza,
+.catlogo {
+  margin: 0;
+  font-family: var(--font-inter);
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.link5 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  height: 40px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.link5:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+.acceder {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+}
+@media screen and (max-width: 950px) {
+  .headerEncontrarpieza {
+    padding: 18px 24px;
+  }
+  .navigation {
+    gap: 16px;
+  }
+}
+@media screen and (max-width: 650px) {
+  .container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .navigation {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,86 @@
+.footer {
+  width: 100%;
+  margin-top: auto;
+  background: #071529;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 24px 32px;
+  box-sizing: border-box;
+  color: #ffffff;
+  font-family: var(--font-inter);
+  gap: 32px;
+}
+.container {
+  width: min(1180px, 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+}
+.container2,
+.container4 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 180px;
+}
+.container2 {
+  max-width: 320px;
+}
+.heading3,
+.heading4 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 700;
+}
+.metalMecnicaEl {
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
+}
+.paragraph,
+.list,
+.list2,
+.bisagras {
+  margin: 0;
+  color: #cbd5e1;
+}
+.paragraph {
+  font-size: 14px;
+  line-height: 22px;
+}
+.list,
+.list2 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  color: #cbd5e1;
+}
+.listItem {
+  margin: 0;
+}
+.bisagras {
+  font-size: 14px;
+  line-height: 22px;
+}
+.container6 {
+  width: min(1180px, 100%);
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+.container6 .bisagras {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+@media screen and (max-width: 950px) {
+  .container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

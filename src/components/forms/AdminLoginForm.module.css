@@ -1,0 +1,251 @@
+.loginContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a2a4e 0%, #243556 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+.headerIcon {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.icon {
+  width: 64px;
+  height: 64px;
+  background: #4a7fd7;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 36px;
+  box-shadow: 0 4px 12px rgba(74, 127, 215, 0.3);
+}
+
+.companyName {
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 5px 0;
+  letter-spacing: 0.3px;
+}
+
+.companySubtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-weight: 400;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 50px 40px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+.form {
+  margin-bottom: 30px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  background: #f9f9f9;
+}
+
+.input::placeholder {
+  color: #bbb;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4a7fd7;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(74, 127, 215, 0.1);
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 13px;
+  margin-top: 8px;
+  text-align: center;
+  padding: 10px;
+  background: #fadbd8;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 14px;
+  background: #4a7fd7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submitButton:hover {
+  background: #3a6fbf;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 127, 215, 0.3);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+}
+
+.credentials {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  border-left: 4px solid #4a7fd7;
+}
+
+.credentialsTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  margin: 0 0 15px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.credentialItem {
+  margin-bottom: 15px;
+}
+
+.credentialItem:last-child {
+  margin-bottom: 0;
+}
+
+.credentialItem h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a2a4e;
+  margin: 0 0 6px 0;
+}
+
+.credentialItem p {
+  font-size: 12px;
+  color: #666;
+  margin: 3px 0;
+  font-family: "Courier New", monospace;
+}
+
+.credentialItem span {
+  color: #4a7fd7;
+  font-weight: 600;
+}
+
+.switchMode {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #555;
+}
+
+.switchMode a {
+  color: #4a7fd7;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.switchMode a:hover {
+  text-decoration: underline;
+}
+
+.backLink {
+  display: block;
+  text-align: center;
+  color: #4a7fd7;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.backLink:hover {
+  color: #3a6fbf;
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 40px 20px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .credentials {
+    padding: 15px;
+  }
+
+  .credentialItem p {
+    font-size: 11px;
+  }
+
+  .icon {
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+  }
+
+  .companyName {
+    font-size: 20px;
+  }
+}

@@ -1,0 +1,195 @@
+.containerEncontrarpieza {
+  width: min(760px, 100%);
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 36px;
+  box-shadow: 0 36px 72px rgba(15, 23, 42, 0.08);
+}
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+  font-weight: 600;
+  padding: 12px 18px;
+  border-radius: 999px;
+  width: fit-content;
+  cursor: default;
+}
+.badgeIcon {
+  width: 18px;
+  height: 18px;
+}
+.title {
+  margin: 0;
+  font-size: 48px;
+  line-height: 56px;
+  font-weight: 800;
+  color: #0f172a;
+}
+.description {
+  margin: 0;
+  max-width: 760px;
+  font-size: 18px;
+  line-height: 28px;
+  color: #475569;
+}
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.stepLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+.progressText {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2563eb;
+}
+.progressBar {
+  width: 100%;
+  height: 12px;
+  background: rgba(37, 99, 235, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progressFill {
+  width: 25%;
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+}
+.stepIndicators {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.stepCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #ffffff;
+  color: #64748b;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+.stepActive {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+.questionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
+  border-radius: 32px;
+  background: #ffffff;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+}
+.questionHeader h2 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 32px;
+  color: #0f172a;
+}
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.footerActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.prevButton,
+.nextButton {
+  min-width: 160px;
+  padding: 14px 22px;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+.prevButton {
+  background: rgba(37, 99, 235, 0.1);
+  color: #1e3a8a;
+}
+.prevButton:hover {
+  background: rgba(37, 99, 235, 0.16);
+}
+.nextButton {
+  background: #2563eb;
+  color: #ffffff;
+}
+.nextButton:hover {
+  background: #1d4ed8;
+}
+@media screen and (max-width: 950px) {
+  .containerEncontrarpieza {
+    padding: 36px;
+    gap: 32px;
+  }
+  .title {
+    font-size: 40px;
+    line-height: 48px;
+  }
+  .optionsGrid {
+    grid-template-columns: 1fr;
+  }
+  .footerActions {
+    justify-content: center;
+  }
+}
+@media screen and (max-width: 650px) {
+  .containerEncontrarpieza {
+    padding: 28px;
+  }
+  .title {
+    font-size: 32px;
+    line-height: 40px;
+  }
+  .description {
+    font-size: 16px;
+  }
+}
+@media screen and (max-width: 450px) {
+  .containerEncontrarpieza {
+    padding: 24px;
+  }
+  .progressHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .stepIndicators {
+    gap: 12px;
+  }
+}

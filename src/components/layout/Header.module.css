@@ -1,0 +1,207 @@
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--color-white);
+  border-bottom: var(--border-1);
+  box-sizing: border-box;
+  width: 100%;
+  height: 85px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--padding-16) var(--padding-152) var(--padding-1);
+  max-width: 100%;
+  text-align: left;
+  font-size: var(--fs-24);
+  color: var(--color-gray-100);
+  font-family: var(--font-inter);
+}
+.container,
+.link {
+  display: flex;
+  align-items: center;
+}
+.container {
+  align-self: stretch;
+  justify-content: space-between;
+  gap: var(--gap-20);
+  flex-wrap: wrap;
+}
+.link {
+  min-width: 0;
+  height: var(--height-52);
+  width: auto;
+  gap: var(--gap-12);
+}
+.containerIcon {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-01);
+  background-color: transparent;
+  height: 48px;
+  width: 48px;
+  border-radius: var(--br-10);
+}
+.container2,
+.heading1 {
+  display: flex;
+  align-items: flex-start;
+}
+.container2 {
+  height: var(--height-52);
+  flex: 1;
+  flex-direction: column;
+}
+.heading1 {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+.metalMecnicaEl {
+  margin: 0;
+  height: auto;
+  width: auto;
+  position: relative;
+  font-size: inherit;
+  letter-spacing: -0.6px;
+  line-height: var(--lh-36);
+  font-weight: 700;
+  font-family: inherit;
+  display: inline-block;
+  text-align: left;
+  flex-shrink: 0;
+}
+.paragraph {
+  align-self: center;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-12);
+  color: var(--color-slategray);
+}
+.solucionesB2b {
+  flex: 1;
+  position: relative;
+  line-height: var(--lh-16);
+}
+.navigation {
+  margin: 0;
+  height: auto;
+  width: auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  text-align: left;
+  font-size: var(--fs-14);
+  color: var(--color-darkslategray-100);
+  font-family: var(--font-inter);
+}
+.link2 {
+  height: var(--height-20);
+  display: flex;
+  align-items: flex-start;
+}
+.inicio {
+  position: relative;
+  line-height: var(--lh-20);
+}
+.link3 {
+  height: var(--height-20);
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.encontrarPieza {
+  position: relative;
+  line-height: var(--lh-20);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.link4 {
+  height: var(--height-20);
+  width: 55.7px;
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.catlogo {
+  position: relative;
+  line-height: var(--lh-20);
+  flex-shrink: 0;
+}
+.link5 {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-8) var(--padding-10) var(--padding-8) var(--padding-16);
+  background-color: var(--color-royalblue-100);
+  height: var(--height-36);
+  width: 81.7px;
+  border-radius: var(--br-10);
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+.link5:hover {
+  background-color: var(--color-dodgerblue);
+}
+.acceder {
+  position: relative;
+  font-size: var(--fs-14);
+  line-height: var(--lh-20);
+  font-family: var(--font-inter);
+  color: var(--color-white);
+  text-align: left;
+}
+@media screen and (max-width: 1024px) {
+  .header {
+    padding-left: var(--padding-76);
+    padding-right: var(--padding-76);
+    box-sizing: border-box;
+  }
+  .container {
+    gap: var(--gap-16);
+  }
+  .navigation {
+    width: 100%;
+    justify-content: flex-start;
+    gap: var(--gap-16);
+  }
+  .link5 {
+    width: auto;
+  }
+}
+@media screen and (max-width: 825px) {
+  .header {
+    padding-left: var(--padding-76);
+    padding-right: var(--padding-76);
+    box-sizing: border-box;
+  }
+  .metalMecnicaEl {
+    display: none;
+  }
+  .navigation {
+    width: 100%;
+    justify-content: center;
+    gap: var(--gap-12);
+  }
+}
+@media screen and (max-width: 450px) {
+  .header {
+    padding-left: var(--padding-20);
+    padding-right: var(--padding-20);
+    box-sizing: border-box;
+  }
+  .navigation {
+    display: none;
+    gap: var(--gap-16);
+  }
+}

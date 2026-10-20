@@ -1,0 +1,420 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f8fb;
+}
+
+.header {
+  background: white;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 14px 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.logoIcon {
+  font-size: 24px;
+}
+
+.headerCenter {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  color: #999;
+  font-weight: 500;
+}
+
+.logoutBtn {
+  padding: 8px 16px;
+  background: #2e8d74;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logoutBtn:hover {
+  background: #247063;
+}
+
+.main {
+  flex: 1;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.titleSection {
+  margin-bottom: 24px;
+}
+
+.pageTitle {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin: 0 0 6px 0;
+}
+
+.pageDescription {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.statsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  border-left: 4px solid #2e8d74;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.statIcon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.statNumber {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.statLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 4px;
+}
+
+.statSubLabel {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.filterSection {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.searchInput {
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #2e8d74;
+  box-shadow: 0 0 0 3px rgba(46, 141, 116, 0.1);
+}
+
+.filterButtons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.filterBtn:hover {
+  background: #f5f5f5;
+  border-color: #2e8d74;
+}
+
+.filterBtn.active {
+  background: #2e8d74;
+  border-color: #2e8d74;
+  color: white;
+}
+
+.requestsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.requestCard {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 50px 1fr 180px 80px;
+  gap: 20px;
+  align-items: start;
+  transition: all 0.3s ease;
+}
+
+.requestCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #2e8d74;
+}
+
+.requestIcon {
+  font-size: 32px;
+  text-align: center;
+  padding-top: 5px;
+}
+
+.requestContent {
+  flex: 1;
+}
+
+.requestHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 8px;
+  gap: 16px;
+}
+
+.requestTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.requestId {
+  font-size: 12px;
+  color: #999;
+  white-space: nowrap;
+}
+
+.requestDescription {
+  font-size: 13px;
+  color: #666;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.requestMeta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.author,
+.date {
+  font-size: 12px;
+  color: #999;
+}
+
+.category {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.requestActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-self: start;
+  width: 100%;
+}
+
+.viewDetailsBtn {
+  width: 100%;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #2e8d74;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2e8d74;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.viewDetailsBtn:hover {
+  background: #ecfaf6;
+}
+
+.actionBtn {
+  width: 100%;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.actionBtn:hover {
+  background: #f5f5f5;
+}
+
+.actionBtn.review {
+  background: #e8f5e9;
+  border-color: #66bb6a;
+  color: #2e7d32;
+}
+
+.actionBtn.review:hover {
+  background: #c8e6c9;
+}
+
+.requestStatus {
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 4px;
+  text-align: center;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.03);
+  justify-self: start;
+}
+
+@media (max-width: 1200px) {
+  .statsContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .requestCard {
+    grid-template-columns: 50px 1fr;
+  }
+
+  .requestActions,
+  .requestStatus {
+    grid-column: 1 / -1;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .requestActions {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .requestStatus {
+    justify-self: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    gap: 12px;
+  }
+
+  .headerCenter {
+    display: none;
+  }
+
+  .statsContainer {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .main {
+    padding: 16px;
+  }
+
+  .requestCard {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .requestIcon {
+    font-size: 28px;
+  }
+
+  .requestTitle {
+    font-size: 14px;
+  }
+
+  .requestDescription {
+    font-size: 13px;
+  }
+
+  .pageTitle {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsContainer {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .filterSection {
+    padding: 12px;
+  }
+
+  .requestCard {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .requestIcon {
+    font-size: 28px;
+    justify-self: start;
+  }
+
+  .logoutBtn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .pageTitle {
+    font-size: 20px;
+  }
+}

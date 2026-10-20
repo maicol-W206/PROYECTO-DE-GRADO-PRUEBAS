@@ -1,0 +1,105 @@
+.container {
+  border-radius: var(--br-14);
+  background-color: var(--color-white);
+  border: var(--border-1);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--padding-31) var(--padding-32);
+  gap: var(--gap-24);
+  max-width: 100%;
+  text-align: left;
+  font-size: var(--fs-20);
+  color: var(--color-gray-100);
+  font-family: var(--font-inter);
+}
+.containerIcon {
+  width: var(--width-56);
+  height: var(--height-56);
+  border-radius: var(--br-10);
+}
+.frameParent {
+  flex-direction: column;
+  gap: var(--gap-16);
+}
+.frameParent,
+.heading3,
+.heading3Parent {
+  display: flex;
+  align-items: flex-start;
+}
+.heading3Parent {
+  flex-direction: column;
+  gap: var(--gap-12);
+}
+.heading3 {
+  width: var(--width-323_3);
+}
+.bsquedaInteligente {
+  margin: 0;
+  flex: 1;
+  position: relative;
+  font-size: inherit;
+  line-height: var(--lh-28);
+  font-weight: 700;
+  font-family: inherit;
+}
+.paragraph {
+  height: var(--height-48);
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-0) var(--padding-0) var(--padding-2) var(--padding-0);
+  box-sizing: border-box;
+  font-size: var(--fs-16);
+  color: var(--color-slategray);
+}
+.sistemaGuiadoPaso {
+  margin-top: -2px;
+  height: var(--height-48);
+  width: var(--width-324);
+  position: relative;
+  line-height: var(--lh-24);
+  display: inline-block;
+  flex-shrink: 0;
+}
+.link {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-4) var(--padding-0) var(--padding-2);
+  background-color: transparent;
+  width: var(--width-323_3);
+  height: var(--height-24);
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  gap: 2.3px;
+}
+.icon,
+.probarAhora {
+  position: relative;
+  flex-shrink: 0;
+}
+.probarAhora {
+  margin-top: -6px;
+  height: var(--height-24);
+  width: var(--width-100);
+  font-size: var(--fs-16);
+  line-height: var(--lh-24);
+  font-weight: 600;
+  font-family: var(--font-inter);
+  color: var(--color-royalblue-100);
+  text-align: left;
+  display: inline-block;
+  cursor: pointer;
+}
+.icon {
+  height: var(--height-16);
+  width: var(--width-16);
+}
+@media screen and (max-width: 450px) {
+  .bsquedaInteligente {
+    font-size: var(--fs-16);
+    line-height: var(--lh-22);
+  }
+}
