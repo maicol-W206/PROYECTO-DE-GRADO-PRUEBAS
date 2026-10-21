@@ -1,202 +1,178 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import SubirPlanoForm from "../../components/forms/SubirPlanoForm";
 import styles from "./AsesorDashboard.module.css";
 
-interface Request {
-  id: string;
-  icon: string;
-  title: string;
-  description: string;
-  author: string;
-  date: string;
-  status: "Pendiente" | "En revisión" | "Completado";
-  category: string;
-  categoryColor: string;
-}
-
-interface AsesorDashboardProps {
-  onLogout: () => void;
-}
-
-export default function AsesorDashboard({ onLogout }: AsesorDashboardProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("Todos");
-
-  const requests: Request[] = [
-    {
-      id: "REQ-101",
-      icon: "📌",
-      title: "Validar oferta técnica SOP-015",
-      description: "Revisar condiciones y requerimientos del soporte descontinuado para proponer alternativas.",
-      author: "Ana Ramírez",
-      date: "2026-03-12",
-      category: "Revisión Técnica",
-      status: "Pendiente",
-      categoryColor: "#4caf50",
-    },
-    {
-      id: "REQ-102",
-      icon: "✏️",
-      title: "Actualizar ficha técnica BUJ-002",
-      description: "Completar datos de materiales y tolerancias solicitados por el cliente.",
-      author: "Felipe Díaz",
-      date: "2026-03-10",
-      category: "Documentación",
-      status: "En revisión",
-      categoryColor: "#ffb300",
-    },
-    {
-      id: "REQ-103",
-      icon: "🔍",
-      title: "Revisar consistencia de costos LEN-005",
-      description: "Verificar cambios de precio y su impacto en el catálogo de venta.",
-      author: "Laura Cortés",
-      date: "2026-03-08",
-      category: "Costos",
-      status: "Completado",
-      categoryColor: "#1565c0",
-    },
-  ];
-
-  const filteredRequests = requests.filter((req) => {
-    const matchesSearch =
-      req.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      req.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === "Todos" || req.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
-
-  const pendingCount = requests.filter((r) => r.status === "Pendiente").length;
-  const reviewCount = requests.filter((r) => r.status === "En revisión").length;
-  const completedCount = requests.filter((r) => r.status === "Completado").length;
-
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case "Pendiente":
-        return "#FFA726";
-      case "En revisión":
-        return "#ffb300";
-      case "Completado":
-        return "#66BB6A";
-      default:
-        return "#999";
-    }
-  };
+export default function AsesorDashboard() {
+  const [modalAbierto, setModalAbierto] = useState(false);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.pageBackground}>
+      {/* HEADER DE LA APPLICACIÓN */}
       <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.logoIcon}>🔧</div>
-          <div className={styles.headerCenter}>Acceso Asesor</div>
-          <button className={styles.logoutBtn} onClick={onLogout}>
-            Cerrar sesión
-          </button>
+        <div className={styles.headerContainer}>
+          <div className={styles.logoGroup}>
+            <div className={styles.logoIcon}>⚙️</div>
+            <div>
+              <h1 className={styles.logoTitle}>metal mecánica el imperio</h1>
+              <span className={styles.logoSub}>Soluciones B2B</span>
+            </div>
+          </div>
+          <div className={styles.navLinks}>
+            <Link to="/" className={styles.linkVolver}>volver a sitio</Link>
+            <Link to="/asesor" className={styles.btnAcceder}>Acceder</Link>
+          </div>
         </div>
       </header>
 
-      <main className={styles.main}>
-        <div className={styles.titleSection}>
-          <h1 className={styles.pageTitle}>Panel de Asesor</h1>
-          <p className={styles.pageDescription}>Gestiona las solicitudes que requieran tu revisión y apoyo técnico.</p>
+      {/* CONTENIDO PRINCIPAL */}
+      <main className={styles.container}>
+        {/* ENCABEZADO CON BOTÓN NUEVA SOLICITUD */}
+        <div className={styles.topRow}>
+          <div>
+            <h2 className={styles.pageTitle}>Panel de Asesor</h2>
+            <p className={styles.pageSub}>Gestiona tus solicitudes de cambios</p>
+          </div>
+          <button 
+            className={styles.btnNuevaSolicitud} 
+            onClick={() => setModalAbierto(true)}
+          >
+            + Nueva Solicitud
+          </button>
         </div>
 
-        <div className={styles.statsContainer}>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>⏳</div>
-            <div className={styles.statNumber}>{pendingCount}</div>
-            <div className={styles.statLabel}>Pendientes</div>
-            <div className={styles.statSubLabel}>Requieren revisión</div>
+        {/* METRICAS SUPERIORES (TARJETAS DE RESUMEN) */}
+        <div className={styles.metricsGrid}>
+          <div className={styles.metricCard}>
+            <div className={styles.metricHeader}>
+              <span className={`${styles.iconBadge} ${styles.blueIcon}`}>📄</span>
+              <span className={styles.metricNum}>3</span>
+            </div>
+            <h3 className={styles.metricLabel}>Total Solicitudes</h3>
+            <span className={styles.metricSub}>Todas las solicitudes</span>
           </div>
 
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>📝</div>
-            <div className={styles.statNumber}>{reviewCount}</div>
-            <div className={styles.statLabel}>En revisión</div>
-            <div className={styles.statSubLabel}>Con comentarios activos</div>
+          <div className={styles.metricCard}>
+            <div className={styles.metricHeader}>
+              <span className={`${styles.iconBadge} ${styles.yellowIcon}`}>🕒</span>
+              <span className={styles.metricNum}>2</span>
+            </div>
+            <h3 className={styles.metricLabel}>Pendientes</h3>
+            <span className={styles.metricSub}>En revisión</span>
           </div>
 
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>✅</div>
-            <div className={styles.statNumber}>{completedCount}</div>
-            <div className={styles.statLabel}>Completadas</div>
-            <div className={styles.statSubLabel}>Actualizadas</div>
+          <div className={styles.metricCard}>
+            <div className={styles.metricHeader}>
+              <span className={`${styles.iconBadge} ${styles.greenIcon}`}>✓</span>
+              <span className={styles.metricNum}>0</span>
+            </div>
+            <h3 className={styles.metricLabel}>Aprobadas</h3>
+            <span className={styles.metricSub}>Cambios aplicados</span>
           </div>
-        </div>
 
-        <div className={styles.filterSection}>
-          <input
-            type="text"
-            placeholder="Buscar solicitudes..."
-            className={styles.searchInput}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-
-          <div className={styles.filterButtons}>
-            <button
-              onClick={() => setFilterStatus("Todos")}
-              className={`${styles.filterBtn} ${filterStatus === "Todos" ? styles.active : ""}`}
-            >
-              Todos
-            </button>
-            <button
-              onClick={() => setFilterStatus("Pendiente")}
-              className={`${styles.filterBtn} ${filterStatus === "Pendiente" ? styles.active : ""}`}
-            >
-              Pendientes
-            </button>
-            <button
-              onClick={() => setFilterStatus("En revisión")}
-              className={`${styles.filterBtn} ${filterStatus === "En revisión" ? styles.active : ""}`}
-            >
-              En revisión
-            </button>
-            <button
-              onClick={() => setFilterStatus("Completado")}
-              className={`${styles.filterBtn} ${filterStatus === "Completado" ? styles.active : ""}`}
-            >
-              Completadas
-            </button>
+          <div className={styles.metricCard}>
+            <div className={styles.metricHeader}>
+              <span className={`${styles.iconBadge} ${styles.redIcon}`}>✕</span>
+              <span className={styles.metricNum}>1</span>
+            </div>
+            <h3 className={styles.metricLabel}>Rechazadas</h3>
+            <span className={styles.metricSub}>No aprobadas</span>
           </div>
         </div>
 
-        <div className={styles.requestsList}>
-          {filteredRequests.map((request) => (
-            <div key={request.id} className={styles.requestCard}>
-              <div className={styles.requestIcon}>{request.icon}</div>
-
-              <div className={styles.requestContent}>
-                <div className={styles.requestHeader}>
-                  <h3 className={styles.requestTitle}>{request.title}</h3>
-                  <span className={styles.requestId}>{request.id}</span>
-                </div>
-
-                <p className={styles.requestDescription}>{request.description}</p>
-
-                <div className={styles.requestMeta}>
-                  <span className={styles.author}>👤 {request.author}</span>
-                  <span className={styles.date}>📅 {request.date}</span>
-                  <span
-                    className={styles.category}
-                    style={{ backgroundColor: `${request.categoryColor}20`, color: request.categoryColor }}
-                  >
-                    {request.category}
-                  </span>
-                </div>
-              </div>
-
-              <div className={styles.requestActions}>
-                <button className={styles.viewDetailsBtn}>Abrir</button>
-                <button className={`${styles.actionBtn} ${styles.review}`}>Prop. cambio</button>
-              </div>
-
-              <div className={styles.requestStatus} style={{ color: getStatusColor(request.status) }}>
-                {request.status}
+        {/* TRES COLUMNAS DE ESTADO */}
+        <div className={styles.columnsGrid}>
+          {/* COLUMNA PENDIENTES */}
+          <div className={styles.columnCard}>
+            <div className={styles.columnHeader}>
+              <span className={`${styles.miniBadge} ${styles.yellowIcon}`}>🕒</span>
+              <div>
+                <h4>Pendientes</h4>
+                <p>2 solicitudes</p>
               </div>
             </div>
-          ))}
+
+            <div className={styles.cardsList}>
+              <div className={styles.itemCard}>
+                <div className={styles.itemHeader}>
+                  <span className={styles.itemEditIcon}>📝</span>
+                  <div>
+                    <h5>Actualizar precio buje BUJ-002</h5>
+                    <p>Actualización de precio por cambio en coste de materias primas.</p>
+                  </div>
+                </div>
+                <div className={styles.itemFooter}>
+                  <span className={styles.reqTag}>REQ-002</span>
+                  <span className={styles.itemDate}>2026-03-19</span>
+                </div>
+              </div>
+
+              <div className={styles.itemCard}>
+                <div className={styles.itemHeader}>
+                  <span className={styles.itemEditIcon}>📝</span>
+                  <div>
+                    <h5>Modificar especificaciones LEN-005</h5>
+                    <p>Corregir rango de temperatura en especificaciones técnicas.</p>
+                  </div>
+                </div>
+                <div className={styles.itemFooter}>
+                  <span className={styles.reqTag}>REQ-006</span>
+                  <span className={styles.itemDate}>2026-03-15</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* COLUMNA APROBADAS */}
+          <div className={styles.columnCard}>
+            <div className={styles.columnHeader}>
+              <span className={`${styles.miniBadge} ${styles.greenIcon}`}>✓</span>
+              <div>
+                <h4>Aprobadas</h4>
+                <p>0 solicitudes</p>
+              </div>
+            </div>
+            <div className={styles.emptyState}>No hay solicitudes aprobadas</div>
+          </div>
+
+          {/* COLUMNA RECHAZADAS */}
+          <div className={styles.columnCard}>
+            <div className={styles.columnHeader}>
+              <span className={`${styles.miniBadge} ${styles.redIcon}`}>✕</span>
+              <div>
+                <h4>Rechazadas</h4>
+                <p>1 solicitudes</p>
+              </div>
+            </div>
+
+            <div className={styles.cardsList}>
+              <div className={styles.itemCard}>
+                <div className={styles.itemHeader}>
+                  <span className={styles.itemDeleteIcon}>🗑️</span>
+                  <div>
+                    <h5>Eliminar soporte SOP-015 descontinua...</h5>
+                    <p>El fabricante ha descontinuado este modelo y no hay reemplazos directos.</p>
+                  </div>
+                </div>
+                <div className={styles.itemFooter}>
+                  <span className={styles.reqTag}>REQ-004</span>
+                  <span className={styles.itemDate}>2026-03-17</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
+
+      {/* MODAL PARA SUBIR PLANOS A MYSQL AL DAR CLIC EN "+ NUEVA SOLICITUD" */}
+      {modalAbierto && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <button className={styles.btnCloseModal} onClick={() => setModalAbierto(false)}>✕</button>
+            <SubirPlanoForm />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,11 +1,10 @@
 import { FunctionComponent, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProductCard from "../../components/ui/ProductCard";
-import Footer from "../../components/Footercatalogoproductos";
-import Header from "../../components/Headercatalogoproductos";
+import Header from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer";
 import styles from "./catalogoproductos.module.css";
-import CatalogoPDFs from "../../components/CatalogoPDFs";
-
+import CatalogoPDFs from "./CatalogoPDFs";
 type Product = {
   sku: string;
   stock: string;

@@ -1,7 +1,7 @@
 import { FunctionComponent, useEffect } from "react";
-import Container from "../components/ContainerEncontrarpieza";
-import Footer from "../components/FooterEncontrarpieza";
-import Header from "../components/HeaderEncontrarpieza";
+import ContainerEncontrarpieza from "./ContainerEncontrarpieza";
+import Header from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer";
 import styles from "./Encontrarpieza.module.css";
 
 const Encontrarpieza: FunctionComponent = () => {
@@ -14,7 +14,7 @@ const Encontrarpieza: FunctionComponent = () => {
       <Header />
       <main className={styles.body}>
         <section className={styles.mainContent}>
-          <Container />
+          <ContainerEncontrarpieza />
         </section>
         <Footer />
       </main>

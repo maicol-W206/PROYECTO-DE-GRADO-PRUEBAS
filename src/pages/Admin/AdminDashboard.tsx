@@ -1,255 +1,181 @@
 import { useState } from "react";
-import styles from "./AdminDashboard.module.css";
+import { Link } from "react-router-dom";
+import SubirPlanoForm from "../../components/forms/SubirPlanoForm";
 
-interface Request {
-  id: string;
-  icon: string;
-  title: string;
-  description: string;
-  author: string;
-  date: string;
-  category: string;
-  status: "Pendiente" | "Aprobado" | "Rechazado";
-  categoryColor: string;
-}
-
-interface AdminDashboardProps {
-  onLogout: () => void;
-}
-
-export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("Todos");
-
-  const requests: Request[] = [
-    {
-      id: "REQ-001",
-      icon: "🔧",
-      title: "Agregar nueva bisagra de titanio",
-      description: "Solicitud para agregar una nueva línea de bisagras de titanio para aplicaciones aeroespaciales.",
-      author: "María González",
-      date: "2026-01-25",
-      category: "Agregar Producto",
-      status: "Pendiente",
-      categoryColor: "#FFA726",
-    },
-    {
-      id: "REQ-002",
-      icon: "💰",
-      title: "Actualizar precio bujo BUJ-002",
-      description: "Actualización de precio por cambio en coste de materias primas.",
-      author: "Carlos Ruiz",
-      date: "2026-01-19",
-      category: "Editar Producto",
-      status: "Pendiente",
-      categoryColor: "#42A5F5",
-    },
-    {
-      id: "REQ-003",
-      icon: "📦",
-      title: "Actualizar stock de BIS-001",
-      description: "Actualización de cantidad en stock tras recepción de pedido.",
-      author: "María González",
-      date: "2026-01-18",
-      category: "Editar Producto",
-      status: "Aprobado",
-      categoryColor: "#42A5F5",
-    },
-    {
-      id: "REQ-004",
-      icon: "❌",
-      title: "Eliminar soporte SOP-015 descontinuado",
-      description: "El producto está descontinuado este modelo y no hay reemplazos directos.",
-      author: "Carlos Ruiz",
-      date: "2026-01-17",
-      category: "Eliminar Producto",
-      status: "Rechazado",
-      categoryColor: "#EF5350",
-    },
-    {
-      id: "REQ-005",
-      icon: "📄",
-      title: "Actualizar información de certificaciones",
-      description: "Añadir nueva certificación ISO 14001 a la página de la empresa.",
-      author: "María González",
-      date: "2026-01-16",
-      category: "Cambios de Contenido",
-      status: "Aprobado",
-      categoryColor: "#66BB6A",
-    },
-    {
-      id: "REQ-006",
-      icon: "🔩",
-      title: "Modificar especificaciones LEN-003",
-      description: "Cambiar rango de temperatura en especificaciones técnicas.",
-      author: "Carlos Ruiz",
-      date: "2026-01-15",
-      category: "Editar Producto",
-      status: "Pendiente",
-      categoryColor: "#42A5F5",
-    },
-  ];
-
-  const filteredRequests = requests.filter((req) => {
-    const matchesSearch =
-      req.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      req.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === "Todos" || req.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
-
-  const pendingCount = requests.filter((r) => r.status === "Pendiente").length;
-  const approvedCount = requests.filter((r) => r.status === "Aprobado").length;
-  const rejectedCount = requests.filter((r) => r.status === "Rechazado").length;
-  const approvalRate = ((approvedCount / requests.length) * 100).toFixed(0);
-
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case "Pendiente":
-        return "#FFA726";
-      case "Aprobado":
-        return "#66BB6A";
-      case "Rechazado":
-        return "#EF5350";
-      default:
-        return "#999";
-    }
-  };
+export default function AdminDashboard() {
+  const [mostrarSubida, setMostrarSubida] = useState(false);
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.logoIcon}>🏭</div>
-          <div className={styles.headerCenter}>Acceso Administrador</div>
-          <button className={styles.logoutBtn} onClick={onLogout}>
-            Cerrar sesión
-          </button>
+    <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh", fontFamily: "system-ui, -apple-system, sans-serif", color: "#0f172a" }}>
+      
+      {/* 1. ENCABEZADO / HEADER */}
+      <header style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e2e8f0", padding: "1rem 2rem" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div style={{ backgroundColor: "#2563eb", color: "white", width: "36px", height: "36px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>
+              ⚙️
+            </div>
+            <div>
+              <h1 style={{ fontSize: "1.1rem", fontWeight: "800", margin: 0 }}>metal mecánica el imperio</h1>
+              <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Soluciones B2B</span>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+            <Link to="/" style={{ color: "#0f172a", textDecoration: "none", fontSize: "0.9rem", fontWeight: "500" }}>volver sitio</Link>
+            <Link to="/admin" style={{ backgroundColor: "#2563eb", color: "white", padding: "0.5rem 1.25rem", borderRadius: "8px", textDecoration: "none", fontWeight: "600", fontSize: "0.9rem" }}>Acceder</Link>
+          </div>
         </div>
       </header>
 
-      <main className={styles.main}>
-        <div className={styles.titleSection}>
-          <h1 className={styles.pageTitle}>Panel de Administración</h1>
-          <p className={styles.pageDescription}>Gestiona las solicitudes de cambios y el contenido del sitio</p>
+      {/* 2. CONTENIDO PRINCIPAL */}
+      <main style={{ maxWidth: "1200px", margin: "2rem auto", padding: "0 1.5rem" }}>
+        
+        {/* TÍTULO Y BOTÓN DE ACCIÓN */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+          <div>
+            <h2 style={{ fontSize: "2rem", fontWeight: "800", margin: "0 0 0.25rem 0" }}>Panel de Administración</h2>
+            <p style={{ color: "#94a3b8", fontSize: "0.95rem", margin: 0 }}>Gestiona las solicitudes de cambios y el contenido del sitio</p>
+          </div>
+          <button 
+            onClick={() => setMostrarSubida(!mostrarSubida)}
+            style={{
+              backgroundColor: mostrarSubida ? "#64748b" : "#2563eb",
+              color: "white",
+              border: "none",
+              padding: "0.75rem 1.25rem",
+              borderRadius: "8px",
+              fontWeight: "700",
+              cursor: "pointer"
+            }}
+          >
+            {mostrarSubida ? "✕ Ocultar Subida de Planos" : "+ Cargar Plano / Ficha"}
+          </button>
         </div>
 
-        <div className={styles.statsContainer}>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>⏳</div>
-            <div className={styles.statNumber}>{pendingCount}</div>
-            <div className={styles.statLabel}>Pendientes</div>
-            <div className={styles.statSubLabel}>Requieren atención</div>
+        {/* CARTA DESPLEGABLE DE SUBIDA A MYSQL */}
+        {mostrarSubida && (
+          <div style={{ marginBottom: "2rem" }}>
+            <SubirPlanoForm />
           </div>
+        )}
 
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>✅</div>
-            <div className={styles.statNumber}>{approvedCount}</div>
-            <div className={styles.statLabel}>Aprobadas</div>
-            <div className={styles.statSubLabel}>Últimas 30 días</div>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}>❌</div>
-            <div className={styles.statNumber}>{rejectedCount}</div>
-            <div className={styles.statLabel}>Rechazadas</div>
-            <div className={styles.statSubLabel}>Últimos 30 días</div>
-          </div>
-
-          <div className={styles.approvalRateCard}>
-            <div className={styles.rateIcon}>📊</div>
-            <div className={styles.rateContent}>
-              <div className={styles.rateNumber}>{approvalRate}%</div>
-              <div className={styles.rateLabel}>Tasa de Aprobación</div>
-              <div className={styles.rateSubLabel}>Últimos 90 días</div>
+        {/* TARJETAS DE MÉTRICAS (3, 2, 1, 94%) */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem", marginBottom: "2rem" }}>
+          
+          {/* Pendientes */}
+          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <span style={{ backgroundColor: "#fef3c7", color: "#d97706", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>🕒</span>
+              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>3</span>
             </div>
+            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Pendientes</h3>
+            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Requieren atención</span>
           </div>
+
+          {/* Aprobadas */}
+          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <span style={{ backgroundColor: "#dcfce7", color: "#16a34a", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>✓</span>
+              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>2</span>
+            </div>
+            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Aprobadas</h3>
+            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Este mes</span>
+          </div>
+
+          {/* Rechazadas */}
+          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <span style={{ backgroundColor: "#fee2e2", color: "#dc2626", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>✕</span>
+              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>1</span>
+            </div>
+            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Rechazadas</h3>
+            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Últimos 30 días</span>
+          </div>
+
+          {/* Tasa de Aprobación */}
+          <div style={{ backgroundColor: "#1d4ed8", color: "white", borderRadius: "12px", padding: "1.25rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <span style={{ backgroundColor: "rgba(255,255,255,0.2)", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>📈</span>
+              <span style={{ fontSize: "1.75rem", fontWeight: "800", color: "white" }}>94%</span>
+            </div>
+            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0", color: "white" }}>Tasa de Aprobación</h3>
+            <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.8)" }}>Últimos 90 días</span>
+          </div>
+
         </div>
 
-        <div className={styles.filterSection}>
-          <input
-            type="text"
-            placeholder="Buscar solicitudes..."
-            className={styles.searchInput}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+        {/* BUSCADOR Y FILTROS */}
+        <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1rem 1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "2rem", flexWrap: "wrap" }}>
+          <input 
+            placeholder="🔍 Buscar solicitudes..." 
+            style={{ flex: 1, minWidth: "250px", padding: "0.6rem 1rem", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "0.9rem", outline: "none" }}
           />
-
-          <div className={styles.filterButtons}>
-            <button
-              onClick={() => setFilterStatus("Todos")}
-              className={`${styles.filterBtn} ${filterStatus === "Todos" ? styles.active : ""}`}
-            >
-              Todos
-            </button>
-            <button
-              onClick={() => setFilterStatus("Pendiente")}
-              className={`${styles.filterBtn} ${filterStatus === "Pendiente" ? styles.active : ""}`}
-            >
-              Pendientes
-            </button>
-            <button
-              onClick={() => setFilterStatus("Aprobado")}
-              className={`${styles.filterBtn} ${filterStatus === "Aprobado" ? styles.active : ""}`}
-            >
-              Aprobadas
-            </button>
-            <button
-              onClick={() => setFilterStatus("Rechazado")}
-              className={`${styles.filterBtn} ${filterStatus === "Rechazado" ? styles.active : ""}`}
-            >
-              Rechazadas
-            </button>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button style={{ backgroundColor: "#2563eb", color: "white", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Todas</button>
+            <button style={{ backgroundColor: "#f1f5f9", color: "#64748b", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Pendientes</button>
+            <button style={{ backgroundColor: "#f1f5f9", color: "#64748b", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Aprobadas</button>
+            <button style={{ backgroundColor: "#f1f5f9", color: "#64748b", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Rechazadas</button>
           </div>
         </div>
 
-        <div className={styles.requestsList}>
-          {filteredRequests.map((request) => (
-            <div key={request.id} className={styles.requestCard}>
-              <div className={styles.requestIcon}>{request.icon}</div>
-
-              <div className={styles.requestContent}>
-                <div className={styles.requestHeader}>
-                  <h3 className={styles.requestTitle}>{request.title}</h3>
-                </div>
-
-                <p className={styles.requestDescription}>{request.description}</p>
-
-                <div className={styles.requestMeta}>
-                  <span className={styles.author}>👤 {request.author}</span>
-                  <span className={styles.date}>📅 {request.date}</span>
-                  <span
-                    className={styles.category}
-                    style={{ backgroundColor: `${request.categoryColor}20`, color: request.categoryColor }}
-                  >
-                    {request.category}
-                  </span>
+        {/* TARJETAS DE SOLICITUDES */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          
+          {/* Solicitud 1 */}
+          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.5rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <span style={{ backgroundColor: "#dcfce7", padding: "0.5rem", borderRadius: "8px", height: "fit-content", fontSize: "1.2rem" }}>📦</span>
+                <div>
+                  <h4 style={{ fontSize: "1.05rem", fontWeight: "800", margin: "0 0 0.35rem 0" }}>
+                    Agregar nueva bisagra de titanio <span style={{ color: "#94a3b8", fontWeight: "500", fontSize: "0.85rem", marginLeft: "0.5rem" }}>REQ-001</span>
+                  </h4>
+                  <p style={{ color: "#64748b", fontSize: "0.875rem", margin: "0 0 0.5rem 0" }}>
+                    Solicitud para agregar una nueva línea de bisagras de titanio para aplicaciones aeroespaciales.
+                  </p>
+                  <p style={{ color: "#94a3b8", fontSize: "0.8rem", margin: 0 }}>
+                    María González • 2026-03-20 • <span style={{ backgroundColor: "#dcfce7", color: "#166534", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: "600" }}>Agregar Producto</span>
+                  </p>
                 </div>
               </div>
-
-              <div className={styles.requestSide}>
-                <div className={styles.requestHeaderRight}>
-                  <span className={styles.requestId}>{request.id}</span>
-                </div>
-
-                <div className={styles.requestActions}>
-                  <button className={styles.viewDetailsBtn}>Ver detalles</button>
-                  <button className={`${styles.actionBtn} ${styles.approve}`}>✓ Aprobar</button>
-                  <button className={`${styles.actionBtn} ${styles.reject}`}>✕ Rechazar</button>
-                </div>
-
-                <div className={styles.requestStatus} style={{ color: getStatusColor(request.status) }}>
-                  {request.status === "Pendiente" && "⏳"}
-                  {request.status === "Aprobado" && "✅"}
-                  {request.status === "Rechazado" && "❌"}
-                  {request.status}
-                </div>
-              </div>
+              <span style={{ backgroundColor: "#fef3c7", color: "#b45309", fontSize: "0.8rem", fontWeight: "700", padding: "0.35rem 0.75rem", borderRadius: "9999px" }}>🕒 Pendiente</span>
             </div>
-          ))}
+            <div style={{ display: "flex", gap: "0.75rem", borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
+              <button style={{ background: "none", border: "none", color: "#2563eb", fontWeight: "700", fontSize: "0.875rem", cursor: "pointer" }}>Ver detalles</button>
+              <button style={{ backgroundColor: "#16a34a", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✓ Aprobar</button>
+              <button style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✕ Rechazar</button>
+            </div>
+          </div>
+
+          {/* Solicitud 2 */}
+          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.5rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <span style={{ backgroundColor: "#dbeafe", padding: "0.5rem", borderRadius: "8px", height: "fit-content", fontSize: "1.2rem" }}>📝</span>
+                <div>
+                  <h4 style={{ fontSize: "1.05rem", fontWeight: "800", margin: "0 0 0.35rem 0" }}>
+                    Actualizar precio buje BUJ-002 <span style={{ color: "#94a3b8", fontWeight: "500", fontSize: "0.85rem", marginLeft: "0.5rem" }}>REQ-002</span>
+                  </h4>
+                  <p style={{ color: "#64748b", fontSize: "0.875rem", margin: "0 0 0.5rem 0" }}>
+                    Actualización de precio por cambio en coste de materias primas.
+                  </p>
+                  <p style={{ color: "#94a3b8", fontSize: "0.8rem", margin: 0 }}>
+                    Carlos Ruiz • 2026-03-19 • <span style={{ backgroundColor: "#dbeafe", color: "#1e40af", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: "600" }}>Editar Producto</span>
+                  </p>
+                </div>
+              </div>
+              <span style={{ backgroundColor: "#fef3c7", color: "#b45309", fontSize: "0.8rem", fontWeight: "700", padding: "0.35rem 0.75rem", borderRadius: "9999px" }}>🕒 Pendiente</span>
+            </div>
+            <div style={{ display: "flex", gap: "0.75rem", borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
+              <button style={{ background: "none", border: "none", color: "#2563eb", fontWeight: "700", fontSize: "0.875rem", cursor: "pointer" }}>Ver detalles</button>
+              <button style={{ backgroundColor: "#16a34a", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✓ Aprobar</button>
+              <button style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✕ Rechazar</button>
+            </div>
+          </div>
+
         </div>
+
       </main>
     </div>
   );
 }
-

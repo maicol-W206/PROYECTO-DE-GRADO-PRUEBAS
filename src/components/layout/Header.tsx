@@ -1,88 +1,54 @@
-import { FunctionComponent, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "./Header.module.css";
 
-export type HeaderType = {
-  className?: string;
-};
-
-const Header: FunctionComponent<HeaderType> = ({ className = "" }) => {
-  const navigate = useNavigate();
-
-  // Función para volver al inicio
-  const onGoHomeClick = useCallback(() => {
-    navigate("/");
-  }, [navigate]);
-
-  // Función para ir al catálogo
-  const onGoCatalogoClick = useCallback(() => {
-    navigate("/catalogop");
-  }, [navigate]);
+export default function Header() {
+  const [showLoginMenu, setShowLoginMenu] = useState(false);
 
   return (
-    <header className={[styles.header, className].join(" ")}>
+    <header className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.link}>
-          {/* Este div actúa como escudo para el Logo y Nombre */}
-          <div 
-            onClick={onGoHomeClick} 
-            style={{ 
-              cursor: 'pointer', 
-              zIndex: 99999, 
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}
-          >
-            <img 
-              className={styles.containerIcon} 
-              alt="Inicio" 
-              src="/Container11.svg" 
-            />
-            <div className={styles.container2}>
-              <div className={styles.heading1}>
-                <h3 className={styles.metalMecnicaEl}>
-                  Metal Mecanica El Imperio
-                </h3>
+        <Link to="/" className={styles.logo}>
+          <span className={styles.logoTitle}>Metal Mecanica El Imperio</span>
+          <span className={styles.logoSub}>Soluciones B2B</span>
+        </Link>
+
+        <nav className={styles.nav}>
+          <Link to="/" className={styles.navLink}>Inicio</Link>
+          <Link to="/encontrar-pieza" className={styles.navLink}>Encontrar Pieza</Link>
+          <Link to="/catalogo" className={styles.navLink}>Catálogo</Link>
+
+          {/* MENÚ DESPLEGABLE DE ACCESOS */}
+          <div className={styles.dropdownContainer}>
+            <button 
+              type="button"
+              className={styles.btnAcceder}
+              onClick={() => setShowLoginMenu(!showLoginMenu)}
+            >
+              Acceder ▾
+            </button>
+
+            {showLoginMenu && (
+              <div className={styles.dropdownMenu}>
+                <Link 
+                  to="/asesor" 
+                  className={styles.dropdownItem}
+                  onClick={() => setShowLoginMenu(false)}
+                >
+                  🧑‍💼 Portal Asesor
+                </Link>
+                <Link 
+                  to="/admin" 
+                  className={styles.dropdownItem}
+                  onClick={() => setShowLoginMenu(false)}
+                >
+                  ⚙️ Portal Administrador
+                </Link>
               </div>
-              <div className={styles.paragraph}>
-                <div className={styles.solucionesB2b}>Soluciones B2B</div>
-              </div>
-            </div>
+            )}
           </div>
-        </div>
-
-        <nav className={styles.navigation}>
-          {/* BOTÓN INICIO */}
-          <div 
-            className={styles.link2} 
-            onClick={onGoHomeClick}
-            style={{ cursor: 'pointer', zIndex: 99999, position: 'relative' }}
-          >
-            <div className={styles.inicio}>Inicio</div>
-          </div>
-
-          {/* BOTÓN ENCONTRAR PIEZA (CATÁLOGO) */}
-          <div 
-            className={styles.link3} 
-            onClick={onGoCatalogoClick}
-            style={{ cursor: 'pointer', zIndex: 99999, position: 'relative' }}
-          >
-            <div className={styles.encontrarPieza}>Encontrar Pieza</div>
-          </div>
-
-          <div className={styles.link4}>
-            <div className={styles.catlogo}>Catálogo</div>
-          </div>
-
-          <button className={styles.link5}>
-            <div className={styles.acceder}>Acceder</div>
-          </button>
         </nav>
       </div>
     </header>
   );
-};
-
-export default Header;
+}

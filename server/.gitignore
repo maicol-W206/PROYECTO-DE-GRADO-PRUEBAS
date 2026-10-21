@@ -1,0 +1,14 @@
+# Dependencias y librerías
+node_modules/
+
+# Variables de entorno y contraseñas
+.env
+.env.local
+
+# Archivos de compilación del frontend
+dist/
+build/
+
+# Archivos subidos por los usuarios (para no saturar el repositorio)
+public/docs/*
+!public/docs/.gitkeep

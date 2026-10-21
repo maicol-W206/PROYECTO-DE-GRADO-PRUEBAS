@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { usePdfs, Categoria } from "../hooks/usePdfs";
-import { detectarMaterial } from "../utils/pdfUtils";
+import { usePdfs } from "../../hooks/usePdfs";
+import { detectarMaterial } from "../../utils/pdfUtils";
 import styles from "./CatalogoPDFs.module.css";
+
+// Definición del tipo Categoria para TypeScript
+export type Categoria = "bisagras" | "bujes" | "soportes" | "lenguetas" | "otros";
 
 const CATEGORIAS: { id: Categoria | "todos"; label: string }[] = [
   { id: "todos", label: "Todos" },
@@ -70,7 +73,7 @@ export default function CatalogoPDFs() {
             <article key={d.archivo} className={styles.card}>
               <div className={styles.imagen}>
                 <span className={styles.imagenIcono}>📄</span>
-                <span className={styles.imagenTipo}>{ETIQUETA[d.categoria]}</span>
+                <span className={styles.imagenTipo}>{ETIQUETA[d.categoria as Categoria] ?? "Documento"}</span>
               </div>
 
               <div className={styles.cuerpo}>
@@ -88,7 +91,9 @@ export default function CatalogoPDFs() {
                 <div className={styles.datos}>
                   <div className={styles.dato}>
                     <span className={styles.datoLabel}>Tipo:</span>
-                    <span className={styles.datoValor}>{ETIQUETA[d.categoria]}</span>
+                    <span className={styles.datoValor}>
+                      {ETIQUETA[d.categoria as Categoria] ?? "Otro"}
+                    </span>
                   </div>
                   <div className={styles.dato}>
                     <span className={styles.datoLabel}>Material:</span>

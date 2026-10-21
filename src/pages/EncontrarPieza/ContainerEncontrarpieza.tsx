@@ -1,12 +1,6 @@
-import {
-  FunctionComponent,
-  useState,
-  useCallback,
-  useMemo,
-  useEffect,
-} from "react";
+import {FunctionComponent,useState,useCallback,useMemo,useEffect,} from "react";
 import styles from "./ContainerEncontrarpieza.module.css";
-import { obtenerPDFs, documentoAPieza, Pieza } from "../utils/pdfUtils";
+import { obtenerPDFs, documentoAPieza } from "../../utils/pdfUtils";
 
 export type ContainerType = {
   className?: string;

@@ -1,7 +1,7 @@
 import { FunctionComponent, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Header from "../components/Headercatalogoproductos";
-import Footer from "../components/Footercatalogoproductos";
+import Header from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer"
 import styles from "./ProductDetail.module.css";
 
 type Product = {
