@@ -1,188 +1,386 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import SubirPlanoForm from "../../components/forms/SubirPlanoForm";
-import Login from "../Login/Login";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import SubirPlanoForm from '../../components/forms/SubirPlanoForm';
+import Login from '../Login/Login';
+import { ModalEliminarPdf } from '../../components/modals/ModalEliminarPdf';
+import './Admin.css';
 
-export default function Admin() {
-  const [usuario, setUsuario] = useState<string | null>(null);
-  const [rolUsuario, setRolUsuario] = useState<string | null>(null);
-  const [mostrarSubida, setMostrarSubida] = useState(false);
+export interface Solicitud {
+  id: number;
+  codigo?: string;
+  titulo?: string;
+  nombre?: string;
+  descripcion?: string;
+  solicitante?: string;
+  tipo?: string;
+  estado?: 'Pendiente' | 'Aprobada' | 'Rechazada' | string;
+  fecha_creacion?: string;
+  archivo?: string;
+  origen?: 'piezas' | 'solicitudes';
+}
 
-  useEffect(() => {
-    const sesionGuardada = localStorage.getItem("sesion_usuario");
-    const rolGuardado = localStorage.getItem("rol_usuario");
-    if (sesionGuardada) {
-      setUsuario(sesionGuardada);
-      setRolUsuario(rolGuardado);
+export interface AdminProps {
+  onOpenModal?: () => void;
+}
+
+export default function Admin({ onOpenModal }: AdminProps) {
+  const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('Todas');
+  const [usuario, setUsuario] = useState<string | null>(() => {
+    const sesion = localStorage.getItem('usuario');
+    if (sesion) {
+      try {
+        const parsed = JSON.parse(sesion);
+        return parsed.nombre || parsed.nombreUsuario || parsed;
+      } catch {
+        return sesion;
+      }
     }
-  }, []);
+    return null;
+  });
+  const [rolUsuario, setRolUsuario] = useState<string | null>('admin');
+  const [mostrarModalSubir, setMostrarModalSubir] = useState(false);
+  const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem("sesion_usuario");
-    localStorage.removeItem("rol_usuario");
-    setUsuario(null);
-    setRolUsuario(null);
-    setMostrarSubida(false);
+  const cargarSolicitudes = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/piezas');
+      if (res.ok) {
+        const data = await res.json();
+        setSolicitudes(Array.isArray(data) ? data : []);
+      }
+    } catch (error) {
+      console.error('Error al cargar datos del panel:', error);
+    }
   };
 
-  // SI NO HAY SESIÓN INICIADA, MOSTRAR LA PANTALLA AZUL DE LOGIN
+  useEffect(() => {
+    if (usuario) {
+      cargarSolicitudes();
+    }
+  }, [usuario]);
+
+  const handleAprobarSolicitud = async (id: number) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/solicitudes/${id}/aprobar`, {
+        method: 'PUT',
+      });
+      if (res.ok) {
+        cargarSolicitudes();
+      }
+    } catch (error) {
+      console.error('Error al aprobar solicitud:', error);
+    }
+  };
+
+  const handleRechazarSolicitud = async (id: number) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/solicitudes/${id}/rechazar`, {
+        method: 'PUT',
+      });
+      if (res.ok) {
+        cargarSolicitudes();
+      }
+    } catch (error) {
+      console.error('Error al rechazar solicitud:', error);
+    }
+  };
+
   if (!usuario) {
     return (
-      <Login 
-        tipoPanel="admin" 
+      <Login
+        tipoPanel="admin"
         onLoginExitoso={(usr, rol) => {
           setUsuario(usr);
-          setRolUsuario(rol);
-        }} 
+          setRolUsuario(rol || 'admin');
+        }}
       />
     );
   }
 
+  const solicitudesFiltradas = solicitudes.filter((sol) => {
+    const estadoNorm = (sol.estado || 'Pendiente').toLowerCase();
+    const filtroNorm = filtroEstado.toLowerCase();
+
+    const coincideEstado =
+      filtroEstado === 'Todas' ||
+      estadoNorm === filtroNorm ||
+      (filtroNorm.includes('pendiente') && estadoNorm.includes('pendiente')) ||
+      (filtroNorm.includes('aprobada') && estadoNorm.includes('aprobada')) ||
+      (filtroNorm.includes('rechazada') && estadoNorm.includes('rechazada'));
+
+    const busqNorm = busqueda.toLowerCase().trim();
+    const titNorm = (sol.titulo || sol.nombre || '').toLowerCase();
+    const codNorm = (sol.codigo || '').toLowerCase();
+
+    const coincideTexto = !busqNorm || titNorm.includes(busqNorm) || codNorm.includes(busqNorm);
+
+    return coincideEstado && coincideTexto;
+  });
+
+  const totalPendientes = solicitudes.filter((s) => (s.estado || '').toLowerCase().includes('pendiente')).length;
+  const totalAprobadas = solicitudes.filter((s) => (s.estado || '').toLowerCase().includes('aprobada')).length;
+  const totalRechazadas = solicitudes.filter((s) => (s.estado || '').toLowerCase().includes('rechazada')).length;
+
+  const handleCerrarSesion = () => {
+    localStorage.removeItem('usuario');
+    setUsuario(null);
+  };
+
   return (
-    <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh", fontFamily: "system-ui, -apple-system, sans-serif", color: "#0f172a" }}>
-      
-      {/* HEADER CORPORATIVO */}
-      <header style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e2e8f0", padding: "1rem 2rem" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <div style={{ backgroundColor: "#2563eb", color: "white", width: "36px", height: "36px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>
-              ⚙️
-            </div>
+    <div className="admin-container">
+      <header className="admin-header">
+        <div className="admin-header-content">
+          <div className="admin-logo-box">
+            <div className="admin-logo-icon">⚙️</div>
             <div>
-              <h1 style={{ fontSize: "1.1rem", fontWeight: "800", margin: 0 }}>metal mecánica el imperio</h1>
-              <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Soluciones B2B</span>
+              <h1 className="admin-logo-title">metal mecánica el imperio</h1>
+              <span className="admin-logo-subtitle">Soluciones B2B</span>
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-            <Link to="/" style={{ color: "#0f172a", textDecoration: "none", fontSize: "0.9rem", fontWeight: "500" }}>volver sitio</Link>
-            
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-              <span style={{ fontSize: "0.85rem", color: "#2563eb", fontWeight: "700" }}>
-                👤 {usuario} {rolUsuario ? `(${rolUsuario})` : ""}
-              </span>
-              <button 
-                onClick={handleLogout}
-                style={{ backgroundColor: "#ef4444", color: "white", border: "none", padding: "0.5rem 1rem", borderRadius: "8px", fontWeight: "600", fontSize: "0.85rem", cursor: "pointer" }}
-              >
-                Cerrar Sesión
-              </button>
-            </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <Link to="/" style={{ color: '#475569', textDecoration: 'none', fontWeight: 500 }}>
+              volver sitio
+            </Link>
+            <span style={{ fontWeight: 'bold', color: '#2563eb' }}>
+              👤 {usuario} {rolUsuario ? `(${rolUsuario})` : ''}
+            </span>
+            <button
+              onClick={handleCerrarSesion}
+              style={{
+                backgroundColor: '#ef4444',
+                color: '#fff',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              Cerrar Sesión
+            </button>
           </div>
         </div>
       </header>
 
-      {/* CONTENIDO DEL PANEL DE ADMIN */}
-      <main style={{ maxWidth: "1200px", margin: "2rem auto", padding: "0 1.5rem" }}>
-        
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+      <main style={{ maxWidth: '1200px', margin: '30px auto', padding: '0 20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
           <div>
-            <h2 style={{ fontSize: "2rem", fontWeight: "800", margin: "0 0 0.25rem 0" }}>Panel de Administración</h2>
-            <p style={{ color: "#94a3b8", fontSize: "0.95rem", margin: 0 }}>Gestiona las solicitudes de cambios y el contenido del sitio</p>
+            <h2 style={{ fontSize: '28px', margin: '0 0 5px 0', color: '#0f172a' }}>Panel de Administración</h2>
+            <p style={{ margin: 0, color: '#64748b' }}>Gestiona las solicitudes de cambios y el contenido del sitio</p>
           </div>
-          <button 
-            onClick={() => setMostrarSubida(!mostrarSubida)}
-            style={{
-              backgroundColor: mostrarSubida ? "#64748b" : "#2563eb",
-              color: "white",
-              border: "none",
-              padding: "0.75rem 1.25rem",
-              borderRadius: "8px",
-              fontWeight: "700",
-              cursor: "pointer"
-            }}
-          >
-            {mostrarSubida ? "✕ Ocultar Subida" : "+ Cargar Plano / Ficha"}
-          </button>
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+              onClick={() => setMostrarModalEliminar(true)}
+              style={{
+                backgroundColor: '#dc2626',
+                color: '#fff',
+                border: 'none',
+                padding: '10px 18px',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              🗑️ Eliminar PDF
+            </button>
+
+            <button
+              onClick={() => {
+                if (onOpenModal) onOpenModal();
+                setMostrarModalSubir(true);
+              }}
+              style={{
+                backgroundColor: '#2563eb',
+                color: '#fff',
+                border: 'none',
+                padding: '10px 18px',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              + Cargar Plano / Ficha
+            </button>
+          </div>
         </div>
 
-        {mostrarSubida && (
-          <div style={{ marginBottom: "2rem" }}>
-            <SubirPlanoForm />
+        {/* 3 Tarjetas de Métricas */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', marginBottom: '25px' }}>
+          <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '24px', fontWeight: 'bold' }}>
+              <span>🕒</span> <span>{totalPendientes}</span>
+            </div>
+            <p style={{ margin: '10px 0 0 0', fontWeight: 'bold', color: '#334155' }}>Pendientes</p>
+            <small style={{ color: '#94a3b8' }}>Requieren atención</small>
+          </div>
+
+          <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '24px', fontWeight: 'bold', color: '#16a34a' }}>
+              <span>✅</span> <span>{totalAprobadas}</span>
+            </div>
+            <p style={{ margin: '10px 0 0 0', fontWeight: 'bold', color: '#334155' }}>Aprobadas</p>
+            <small style={{ color: '#94a3b8' }}>Fichas registradas</small>
+          </div>
+
+          <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '24px', fontWeight: 'bold', color: '#dc2626' }}>
+              <span>❌</span> <span>{totalRechazadas}</span>
+            </div>
+            <p style={{ margin: '10px 0 0 0', fontWeight: 'bold', color: '#334155' }}>Rechazadas</p>
+            <small style={{ color: '#94a3b8' }}>Últimos 30 días</small>
+          </div>
+        </div>
+
+        {/* Buscador y Filtros */}
+        <div style={{ backgroundColor: '#fff', padding: '15px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', marginBottom: '20px', display: 'flex', gap: '15px' }}>
+          <input
+            type="text"
+            placeholder="🔍 Buscar solicitudes o fichas..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            style={{ flex: 1, padding: '10px 15px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+          />
+
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {['Todas', 'Pendientes', 'Aprobadas', 'Rechazadas'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFiltroEstado(f)}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: filtroEstado === f ? '#2563eb' : '#f1f5f9',
+                  color: filtroEstado === f ? '#fff' : '#475569',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tabla */}
+        {solicitudesFiltradas.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '50px 0', color: '#94a3b8' }}>
+            No se encontraron solicitudes o fichas registradas.
+          </div>
+        ) : (
+          <div style={{ backgroundColor: '#fff', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: 'left', fontSize: '13px', color: '#64748b' }}>
+                  <th style={{ padding: '12px 20px' }}>CÓDIGO / ID</th>
+                  <th style={{ padding: '12px 20px' }}>TÍTULO / FICHA</th>
+                  <th style={{ padding: '12px 20px' }}>TIPO</th>
+                  <th style={{ padding: '12px 20px' }}>ESTADO</th>
+                  <th style={{ padding: '12px 20px' }}>ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody>
+                {solicitudesFiltradas.map((item) => {
+                  const estNorm = (item.estado || '').toLowerCase();
+                  const esPendiente = estNorm.includes('pendiente');
+                  const esRechazada = estNorm.includes('rechazada');
+
+                  return (
+                    <tr key={`${item.origen || 'p'}-${item.id}`} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '14px' }}>
+                      <td style={{ padding: '12px 20px', fontWeight: 'bold' }}>{item.codigo || `ID-${item.id}`}</td>
+                      <td style={{ padding: '12px 20px' }}>{item.titulo || item.nombre || 'FICHA TÉCNICA'}</td>
+                      <td style={{ padding: '12px 20px', textTransform: 'capitalize' }}>{item.tipo || 'General'}</td>
+                      <td style={{ padding: '12px 20px' }}>
+                        <span
+                          style={{
+                            padding: '4px 10px',
+                            borderRadius: '12px',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            backgroundColor: esPendiente ? '#fef3c7' : esRechazada ? '#fee2e2' : '#dcfce7',
+                            color: esPendiente ? '#92400e' : esRechazada ? '#991b1b' : '#166534',
+                          }}
+                        >
+                          {item.estado || 'Aprobada'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px 20px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        {item.archivo && (
+                          <a
+                            href={`http://localhost:5000/docs/${item.archivo}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: '#2563eb', fontWeight: 'bold', textDecoration: 'none', marginRight: '5px' }}
+                          >
+                            📄 Ver
+                          </a>
+                        )}
+
+                        {esPendiente && (
+                          <>
+                            <button
+                              onClick={() => handleAprobarSolicitud(item.id)}
+                              style={{
+                                backgroundColor: '#16a34a',
+                                color: '#fff',
+                                border: 'none',
+                                padding: '5px 10px',
+                                borderRadius: '6px',
+                                fontWeight: 'bold',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              ✓ Aprobar
+                            </button>
+
+                            <button
+                              onClick={() => handleRechazarSolicitud(item.id)}
+                              style={{
+                                backgroundColor: '#dc2626',
+                                color: '#fff',
+                                border: 'none',
+                                padding: '5px 10px',
+                                borderRadius: '6px',
+                                fontWeight: 'bold',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              ✕ Rechazar
+                            </button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
-
-        {/* MÉTRICAS */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem", marginBottom: "2rem" }}>
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#fef3c7", color: "#d97706", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>🕒</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>3</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Pendientes</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Requieren atención</span>
-          </div>
-
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#dcfce7", color: "#16a34a", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>✓</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>2</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Aprobadas</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Este mes</span>
-          </div>
-
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#fee2e2", color: "#dc2626", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>✕</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>1</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Rechazadas</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Últimos 30 días</span>
-          </div>
-
-          <div style={{ backgroundColor: "#1d4ed8", color: "white", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "rgba(255,255,255,0.2)", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>📈</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800", color: "white" }}>94%</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0", color: "white" }}>Tasa de Aprobación</h3>
-            <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.8)" }}>Últimos 90 días</span>
-          </div>
-        </div>
-
-        {/* BUSCADOR */}
-        <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1rem 1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "2rem", flexWrap: "wrap" }}>
-          <input 
-            placeholder="🔍 Buscar solicitudes..." 
-            style={{ flex: 1, minWidth: "250px", padding: "0.6rem 1rem", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "0.9rem", outline: "none" }}
-          />
-          <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button style={{ backgroundColor: "#2563eb", color: "white", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Todas</button>
-            <button style={{ backgroundColor: "#f1f5f9", color: "#64748b", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Pendientes</button>
-            <button style={{ backgroundColor: "#f1f5f9", color: "#64748b", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Aprobadas</button>
-            <button style={{ backgroundColor: "#f1f5f9", color: "#64748b", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Rechazadas</button>
-          </div>
-        </div>
-
-        {/* SOLICITUDES */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
-              <div style={{ display: "flex", gap: "1rem" }}>
-                <span style={{ backgroundColor: "#dcfce7", padding: "0.5rem", borderRadius: "8px", height: "fit-content", fontSize: "1.2rem" }}>📦</span>
-                <div>
-                  <h4 style={{ fontSize: "1.05rem", fontWeight: "800", margin: "0 0 0.35rem 0" }}>
-                    Agregar nueva bisagra de titanio <span style={{ color: "#94a3b8", fontWeight: "500", fontSize: "0.85rem", marginLeft: "0.5rem" }}>REQ-001</span>
-                  </h4>
-                  <p style={{ color: "#64748b", fontSize: "0.875rem", margin: "0 0 0.5rem 0" }}>
-                    Solicitud para agregar una nueva línea de bisagras de titanio para aplicaciones aeroespaciales.
-                  </p>
-                  <p style={{ color: "#94a3b8", fontSize: "0.8rem", margin: 0 }}>
-                    María González • 2026-03-20 • <span style={{ backgroundColor: "#dcfce7", color: "#166534", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: "600" }}>Agregar Producto</span>
-                  </p>
-                </div>
-              </div>
-              <span style={{ backgroundColor: "#fef3c7", color: "#b45309", fontSize: "0.8rem", fontWeight: "700", padding: "0.35rem 0.75rem", borderRadius: "9999px" }}>🕒 Pendiente</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.75rem", borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
-              <button style={{ background: "none", border: "none", color: "#2563eb", fontWeight: "700", fontSize: "0.875rem", cursor: "pointer" }}>Ver detalles</button>
-              <button style={{ backgroundColor: "#16a34a", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✓ Aprobar</button>
-              <button style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✕ Rechazar</button>
-            </div>
-          </div>
-        </div>
-
       </main>
+
+      {mostrarModalSubir && (
+        <SubirPlanoForm
+          onClose={() => {
+            setMostrarModalSubir(false);
+            cargarSolicitudes();
+          }}
+        />
+      )}
+
+      <ModalEliminarPdf
+        isOpen={mostrarModalEliminar}
+        onClose={() => {
+          setMostrarModalEliminar(false);
+          cargarSolicitudes();
+        }}
+      />
     </div>
   );
 }

@@ -1,137 +1,239 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import SubirPlanoForm from "../../components/forms/SubirPlanoForm";
-import Login from "../Login/Login";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import SubirPlanoForm from '../../components/forms/SubirPlanoForm';
+import Login from '../Login/Login';
+
+export interface Solicitud {
+  id: number;
+  codigo?: string;
+  titulo?: string;
+  nombre?: string;
+  descripcion?: string;
+  tipo?: string;
+  estado?: string;
+  archivo?: string;
+}
 
 export default function Asesor() {
-  const [usuario, setUsuario] = useState<string | null>(null);
-  const [modalSubida, setModalSubida] = useState(false);
-
-  useEffect(() => {
-    const sesionGuardada = localStorage.getItem("sesion_usuario");
-    if (sesionGuardada) {
-      setUsuario(sesionGuardada);
+  const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('Todas');
+  const [usuario, setUsuario] = useState<string | null>(() => {
+    const sesion = localStorage.getItem('usuario');
+    if (sesion) {
+      try {
+        const parsed = JSON.parse(sesion);
+        return parsed.nombre || parsed.nombreUsuario || parsed;
+      } catch {
+        return sesion;
+      }
     }
-  }, []);
+    return null;
+  });
+  const [mostrarModalSubir, setMostrarModalSubir] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem("sesion_usuario");
-    localStorage.removeItem("rol_usuario");
-    setUsuario(null);
-    setModalSubida(false);
+  const cargarSolicitudes = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/piezas');
+      if (res.ok) {
+        const data = await res.json();
+        setSolicitudes(Array.isArray(data) ? data : []);
+      }
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+    }
   };
 
-  // SI NO HAY SESIÓN INICIADA, MOSTRAR LA PANTALLA AZUL DE LOGIN
+  useEffect(() => {
+    if (usuario) {
+      cargarSolicitudes();
+    }
+  }, [usuario]);
+
   if (!usuario) {
     return (
-      <Login 
-        tipoPanel="asesor" 
-        onLoginExitoso={(usr) => setUsuario(usr)} 
+      <Login
+        tipoPanel="asesor"
+        onLoginExitoso={(usr) => setUsuario(usr)}
       />
     );
   }
 
+  const solicitudesFiltradas = solicitudes.filter((sol) => {
+    const estadoNorm = (sol.estado || 'Pendiente').toLowerCase();
+    const filtroNorm = filtroEstado.toLowerCase();
+
+    const coincideEstado =
+      filtroEstado === 'Todas' ||
+      estadoNorm === filtroNorm ||
+      (filtroNorm.includes('pendiente') && estadoNorm.includes('pendiente')) ||
+      (filtroNorm.includes('aprobada') && estadoNorm.includes('aprobada')) ||
+      (filtroNorm.includes('rechazada') && estadoNorm.includes('rechazada'));
+
+    const busqNorm = busqueda.toLowerCase().trim();
+    const titNorm = (sol.titulo || sol.nombre || '').toLowerCase();
+    const codNorm = (sol.codigo || '').toLowerCase();
+
+    const coincideTexto = !busqNorm || titNorm.includes(busqNorm) || codNorm.includes(busqNorm);
+
+    return coincideEstado && coincideTexto;
+  });
+
+  const handleCerrarSesion = () => {
+    localStorage.removeItem('usuario');
+    setUsuario(null);
+  };
+
   return (
-    <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh", fontFamily: "system-ui, -apple-system, sans-serif", color: "#0f172a" }}>
-      
-      {/* HEADER */}
-      <header style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e2e8f0", padding: "1rem 2rem" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <div style={{ backgroundColor: "#2563eb", color: "white", width: "36px", height: "36px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>
-              ⚙️
-            </div>
-            <div>
-              <h1 style={{ fontSize: "1.1rem", fontWeight: "800", margin: 0 }}>metal mecánica el imperio</h1>
-              <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Soluciones B2B</span>
-            </div>
+    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <header style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', padding: '15px 30px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '24px' }}>⚙️</span>
+            <h1 style={{ fontSize: '18px', margin: 0, textTransform: 'lowercase', color: '#0f172a' }}>
+              metal mecánica el imperio <span style={{ color: '#2563eb', fontSize: '12px' }}>panel de asesores</span>
+            </h1>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-            <Link to="/" style={{ color: "#0f172a", textDecoration: "none", fontSize: "0.9rem", fontWeight: "500" }}>volver a sitio</Link>
-            
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-              <span style={{ fontSize: "0.85rem", color: "#2563eb", fontWeight: "600" }}>👤 {usuario}</span>
-              <button 
-                onClick={handleLogout}
-                style={{ backgroundColor: "#ef4444", color: "white", border: "none", padding: "0.5rem 1rem", borderRadius: "8px", fontWeight: "600", fontSize: "0.85rem", cursor: "pointer" }}
-              >
-                Cerrar Sesión
-              </button>
-            </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <Link to="/" style={{ color: '#475569', textDecoration: 'none' }}>volver sitio</Link>
+            <span style={{ fontWeight: 'bold', color: '#2563eb' }}>👤 {usuario}</span>
+            <button
+              onClick={handleCerrarSesion}
+              style={{
+                backgroundColor: '#ef4444',
+                color: '#fff',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              Cerrar Sesión
+            </button>
           </div>
         </div>
       </header>
 
-      {/* CONTENIDO DE ASESOR */}
-      <main style={{ maxWidth: "1200px", margin: "2rem auto", padding: "0 1.5rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
+      <main style={{ maxWidth: '1200px', margin: '30px auto', padding: '0 20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
           <div>
-            <h2 style={{ fontSize: "2rem", fontWeight: "800", margin: "0 0 0.25rem 0" }}>Panel de Asesor</h2>
-            <p style={{ color: "#94a3b8", fontSize: "0.95rem", margin: 0 }}>Gestiona tus solicitudes de cambios</p>
+            <h2 style={{ fontSize: '28px', margin: '0 0 5px 0', color: '#0f172a' }}>Panel de Asesores</h2>
+            <p style={{ margin: 0, color: '#64748b' }}>Sube planos y consulta el estado de tus peticiones</p>
           </div>
-          <button 
-            onClick={() => setModalSubida(true)}
-            style={{ backgroundColor: "#1d4ed8", color: "white", border: "none", padding: "0.75rem 1.5rem", borderRadius: "8px", fontWeight: "700", fontSize: "0.95rem", cursor: "pointer" }}
+
+          <button
+            onClick={() => setMostrarModalSubir(true)}
+            style={{
+              backgroundColor: '#2563eb',
+              color: '#fff',
+              border: 'none',
+              padding: '10px 18px',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
           >
-            + Nueva Solicitud
+            + Solicitar Subida de Plano
           </button>
         </div>
 
-        {/* MÉTRICAS */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem", marginBottom: "2rem" }}>
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#dbeafe", color: "#2563eb", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>📄</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>3</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Total Solicitudes</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Todas las solicitudes</span>
-          </div>
+        {/* Buscador y Píldoras de Filtro */}
+        <div style={{ backgroundColor: '#fff', padding: '15px', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', marginBottom: '20px', display: 'flex', gap: '15px' }}>
+          <input
+            type="text"
+            placeholder="🔍 Buscar peticiones o fichas..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            style={{ flex: 1, padding: '10px 15px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+          />
 
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#fef3c7", color: "#d97706", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>🕒</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>2</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Pendientes</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>En revisión</span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {['Todas', 'Pendientes', 'Aprobadas', 'Rechazadas'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFiltroEstado(f)}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: filtroEstado === f ? '#2563eb' : '#f1f5f9',
+                  color: filtroEstado === f ? '#fff' : '#475569',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                {f}
+              </button>
+            ))}
           </div>
+        </div>
 
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#dcfce7", color: "#16a34a", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>✓</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>0</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Aprobadas</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Cambios aplicados</span>
-          </div>
+        {/* Tabla */}
+        <div style={{ backgroundColor: '#fff', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: 'left', fontSize: '13px', color: '#64748b' }}>
+                <th style={{ padding: '12px 20px' }}>CÓDIGO</th>
+                <th style={{ padding: '12px 20px' }}>TÍTULO / FICHA</th>
+                <th style={{ padding: '12px 20px' }}>ESTADO</th>
+                <th style={{ padding: '12px 20px' }}>DOCUMENTO</th>
+              </tr>
+            </thead>
+            <tbody>
+              {solicitudesFiltradas.map((item) => {
+                const estNorm = (item.estado || '').toLowerCase();
+                const esPendiente = estNorm.includes('pendiente');
+                const esRechazada = estNorm.includes('rechazada');
 
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#fee2e2", color: "#dc2626", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>✕</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>1</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Rechazadas</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>No aprobadas</span>
-          </div>
+                return (
+                  <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '14px' }}>
+                    <td style={{ padding: '12px 20px', fontWeight: 'bold' }}>{item.codigo || `ID-${item.id}`}</td>
+                    <td style={{ padding: '12px 20px' }}>{item.titulo || item.nombre || 'FICHA TÉCNICA'}</td>
+                    <td style={{ padding: '12px 20px' }}>
+                      <span
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          backgroundColor: esPendiente ? '#fef3c7' : esRechazada ? '#fee2e2' : '#dcfce7',
+                          color: esPendiente ? '#92400e' : esRechazada ? '#991b1b' : '#166534',
+                        }}
+                      >
+                        {item.estado || 'Aprobada'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px 20px' }}>
+                      {item.archivo && (
+                        <a
+                          href={`http://localhost:5000/docs/${item.archivo}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ color: '#2563eb', fontWeight: 'bold', textDecoration: 'none' }}
+                        >
+                          📄 Ver Documento
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </main>
 
-      {/* MODAL DE SUBIDA */}
-      {modalSubida && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div style={{ position: "relative", backgroundColor: "white", borderRadius: "12px", padding: "1.5rem", maxWidth: "520px", width: "90%" }}>
-            <button 
-              onClick={() => setModalSubida(false)}
-              style={{ position: "absolute", top: "12px", right: "16px", background: "none", border: "none", fontSize: "1.25rem", cursor: "pointer", color: "#64748b" }}
-            >
-              ✕
-            </button>
-            <SubirPlanoForm />
-          </div>
-        </div>
+      {mostrarModalSubir && (
+        <SubirPlanoForm
+          esAsesor={true}
+          onClose={() => {
+            setMostrarModalSubir(false);
+            cargarSolicitudes();
+          }}
+        />
       )}
-
     </div>
   );
 }

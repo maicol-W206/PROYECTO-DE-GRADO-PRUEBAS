@@ -1,181 +1,204 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import SubirPlanoForm from "../../components/forms/SubirPlanoForm";
+import React, { useState, useEffect } from 'react';
 
-export default function AdminDashboard() {
-  const [mostrarSubida, setMostrarSubida] = useState(false);
+export interface Solicitud {
+  id: number;
+  codigo: string;
+  titulo: string;
+  descripcion: string;
+  solicitante: string;
+  tipo: string;
+  estado: 'Pendiente' | 'Aprobada' | 'Rechazada';
+  fecha_creacion?: string;
+}
+
+export const AdminDashboard: React.FC = () => {
+  const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
+  const [filtroEstado, setFiltroEstado] = useState<'Todas' | 'Pendiente' | 'Aprobada' | 'Rechazada'>('Todas');
+  const [busqueda, setBusqueda] = useState<string>('');
+  const [cargando, setCargando] = useState<boolean>(true);
+
+  // Cargar solicitudes desde MySQL
+  const cargarSolicitudes = async (): Promise<void> => {
+    try {
+      const res = await fetch('http://localhost:5000/api/solicitudes');
+      if (!res.ok) throw new Error('Error en la respuesta del servidor');
+      const data: Solicitud[] = await res.json();
+      setSolicitudes(data);
+    } catch (error) {
+      console.error('Error al obtener solicitudes:', error);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarSolicitudes();
+  }, []);
+
+  // Aprobar o Rechazar solicitud
+  const cambiarEstado = async (id: number, nuevoEstado: 'Aprobada' | 'Rechazada'): Promise<void> => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/solicitudes/${id}/estado`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: nuevoEstado }),
+      });
+
+      if (res.ok) {
+        await cargarSolicitudes(); // Refresca lista y contadores
+      }
+    } catch (error) {
+      console.error('Error al actualizar estado:', error);
+    }
+  };
+
+  // Métricas dinámicas calculadas desde los datos reales de MySQL
+  const pendientesCount = solicitudes.filter((s) => s.estado === 'Pendiente').length;
+  const aprobadasCount = solicitudes.filter((s) => s.estado === 'Aprobada').length;
+  const rechazadasCount = solicitudes.filter((s) => s.estado === 'Rechazada').length;
+  const totalEvaluadas = aprobadasCount + rechazadasCount;
+  const tasaAprobacion = totalEvaluadas > 0 ? Math.round((aprobadasCount / totalEvaluadas) * 100) : 0;
+
+  // Filtrado por buscador y pestañas
+  const solicitudesFiltradas = solicitudes.filter((sol) => {
+    const coincideEstado = filtroEstado === 'Todas' || sol.estado === filtroEstado;
+    const coincideTexto =
+      sol.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
+      sol.codigo.toLowerCase().includes(busqueda.toLowerCase()) ||
+      sol.solicitante.toLowerCase().includes(busqueda.toLowerCase());
+    return coincideEstado && coincideTexto;
+  });
 
   return (
-    <div style={{ backgroundColor: "#f8fafc", minHeight: "100vh", fontFamily: "system-ui, -apple-system, sans-serif", color: "#0f172a" }}>
-      
-      {/* 1. ENCABEZADO / HEADER */}
-      <header style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e2e8f0", padding: "1rem 2rem" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <div style={{ backgroundColor: "#2563eb", color: "white", width: "36px", height: "36px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>
-              ⚙️
-            </div>
-            <div>
-              <h1 style={{ fontSize: "1.1rem", fontWeight: "800", margin: 0 }}>metal mecánica el imperio</h1>
-              <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>Soluciones B2B</span>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-            <Link to="/" style={{ color: "#0f172a", textDecoration: "none", fontSize: "0.9rem", fontWeight: "500" }}>volver sitio</Link>
-            <Link to="/admin" style={{ backgroundColor: "#2563eb", color: "white", padding: "0.5rem 1.25rem", borderRadius: "8px", textDecoration: "none", fontWeight: "600", fontSize: "0.9rem" }}>Acceder</Link>
-          </div>
-        </div>
-      </header>
+    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      <h1>Panel de Administración</h1>
+      <p style={{ color: '#666' }}>Gestiona las solicitudes de cambios y el contenido del sitio</p>
 
-      {/* 2. CONTENIDO PRINCIPAL */}
-      <main style={{ maxWidth: "1200px", margin: "2rem auto", padding: "0 1.5rem" }}>
-        
-        {/* TÍTULO Y BOTÓN DE ACCIÓN */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-          <div>
-            <h2 style={{ fontSize: "2rem", fontWeight: "800", margin: "0 0 0.25rem 0" }}>Panel de Administración</h2>
-            <p style={{ color: "#94a3b8", fontSize: "0.95rem", margin: 0 }}>Gestiona las solicitudes de cambios y el contenido del sitio</p>
-          </div>
-          <button 
-            onClick={() => setMostrarSubida(!mostrarSubida)}
+      {/* Métricas dinámicas */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', marginBottom: '25px' }}>
+        <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#fff' }}>
+          <h2 style={{ margin: 0, fontSize: '28px' }}>{pendientesCount}</h2>
+          <p style={{ margin: 0, fontWeight: 'bold' }}>Pendientes</p>
+          <small style={{ color: '#888' }}>Requieren atención</small>
+        </div>
+        <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#fff' }}>
+          <h2 style={{ margin: 0, fontSize: '28px' }}>{aprobadasCount}</h2>
+          <p style={{ margin: 0, fontWeight: 'bold' }}>Aprobadas</p>
+          <small style={{ color: '#888' }}>Este mes</small>
+        </div>
+        <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#fff' }}>
+          <h2 style={{ margin: 0, fontSize: '28px' }}>{rechazadasCount}</h2>
+          <p style={{ margin: 0, fontWeight: 'bold' }}>Rechazadas</p>
+          <small style={{ color: '#888' }}>Últimos 30 días</small>
+        </div>
+        <div style={{ padding: '15px', borderRadius: '8px', backgroundColor: '#1d4ed8', color: '#fff' }}>
+          <h2 style={{ margin: 0, fontSize: '28px' }}>{tasaAprobacion}%</h2>
+          <p style={{ margin: 0, fontWeight: 'bold' }}>Tasa de Aprobación</p>
+          <small style={{ color: '#bfdbfe' }}>Últimos 90 días</small>
+        </div>
+      </div>
+
+      {/* Buscador y Pestañas */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        <input
+          type="text"
+          placeholder="Buscar solicitudes..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
+        />
+        {(['Todas', 'Pendiente', 'Aprobada', 'Rechazada'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setFiltroEstado(tab)}
             style={{
-              backgroundColor: mostrarSubida ? "#64748b" : "#2563eb",
-              color: "white",
-              border: "none",
-              padding: "0.75rem 1.25rem",
-              borderRadius: "8px",
-              fontWeight: "700",
-              cursor: "pointer"
+              padding: '10px 15px',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer',
+              backgroundColor: filtroEstado === tab ? '#2563eb' : '#e5e7eb',
+              color: filtroEstado === tab ? '#fff' : '#000',
             }}
           >
-            {mostrarSubida ? "✕ Ocultar Subida de Planos" : "+ Cargar Plano / Ficha"}
+            {tab === 'Todas' ? 'Todas' : `${tab}s`}
           </button>
-        </div>
+        ))}
+      </div>
 
-        {/* CARTA DESPLEGABLE DE SUBIDA A MYSQL */}
-        {mostrarSubida && (
-          <div style={{ marginBottom: "2rem" }}>
-            <SubirPlanoForm />
-          </div>
-        )}
-
-        {/* TARJETAS DE MÉTRICAS (3, 2, 1, 94%) */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem", marginBottom: "2rem" }}>
-          
-          {/* Pendientes */}
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#fef3c7", color: "#d97706", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>🕒</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>3</span>
+      {/* Lista de Solicitudes */}
+      {cargando ? (
+        <p>Cargando solicitudes desde MySQL...</p>
+      ) : solicitudesFiltradas.length === 0 ? (
+        <p style={{ color: '#888' }}>No hay solicitudes que coincidan con la búsqueda.</p>
+      ) : (
+        solicitudesFiltradas.map((sol) => (
+          <div
+            key={sol.id}
+            style={{
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '15px',
+              marginBottom: '12px',
+              backgroundColor: '#fff',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3>
+                {sol.titulo} <small style={{ color: '#6b7280' }}>{sol.codigo}</small>
+              </h3>
+              <span
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  backgroundColor:
+                    sol.estado === 'Pendiente' ? '#fef3c7' : sol.estado === 'Aprobada' ? '#dcfce7' : '#fee2e2',
+                  color:
+                    sol.estado === 'Pendiente' ? '#92400e' : sol.estado === 'Aprobada' ? '#166534' : '#991b1b',
+                }}
+              >
+                {sol.estado}
+              </span>
             </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Pendientes</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Requieren atención</span>
-          </div>
+            <p style={{ color: '#4b5563', margin: '8px 0' }}>{sol.descripcion}</p>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '4px 0' }}>
+              Solicitante: <strong>{sol.solicitante}</strong> • {sol.tipo}
+            </p>
 
-          {/* Aprobadas */}
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#dcfce7", color: "#16a34a", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>✓</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>2</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Aprobadas</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Este mes</span>
-          </div>
-
-          {/* Rechazadas */}
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "#fee2e2", color: "#dc2626", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>✕</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800" }}>1</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0" }}>Rechazadas</h3>
-            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Últimos 30 días</span>
-          </div>
-
-          {/* Tasa de Aprobación */}
-          <div style={{ backgroundColor: "#1d4ed8", color: "white", borderRadius: "12px", padding: "1.25rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <span style={{ backgroundColor: "rgba(255,255,255,0.2)", padding: "0.5rem", borderRadius: "8px", fontSize: "1.1rem" }}>📈</span>
-              <span style={{ fontSize: "1.75rem", fontWeight: "800", color: "white" }}>94%</span>
-            </div>
-            <h3 style={{ fontSize: "1rem", fontWeight: "700", margin: "0 0 0.2rem 0", color: "white" }}>Tasa de Aprobación</h3>
-            <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.8)" }}>Últimos 90 días</span>
-          </div>
-
-        </div>
-
-        {/* BUSCADOR Y FILTROS */}
-        <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1rem 1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "2rem", flexWrap: "wrap" }}>
-          <input 
-            placeholder="🔍 Buscar solicitudes..." 
-            style={{ flex: 1, minWidth: "250px", padding: "0.6rem 1rem", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "0.9rem", outline: "none" }}
-          />
-          <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button style={{ backgroundColor: "#2563eb", color: "white", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Todas</button>
-            <button style={{ backgroundColor: "#f1f5f9", color: "#64748b", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Pendientes</button>
-            <button style={{ backgroundColor: "#f1f5f9", color: "#64748b", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Aprobadas</button>
-            <button style={{ backgroundColor: "#f1f5f9", color: "#64748b", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", fontWeight: "600", fontSize: "0.85rem" }}>Rechazadas</button>
-          </div>
-        </div>
-
-        {/* TARJETAS DE SOLICITUDES */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-          
-          {/* Solicitud 1 */}
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
-              <div style={{ display: "flex", gap: "1rem" }}>
-                <span style={{ backgroundColor: "#dcfce7", padding: "0.5rem", borderRadius: "8px", height: "fit-content", fontSize: "1.2rem" }}>📦</span>
-                <div>
-                  <h4 style={{ fontSize: "1.05rem", fontWeight: "800", margin: "0 0 0.35rem 0" }}>
-                    Agregar nueva bisagra de titanio <span style={{ color: "#94a3b8", fontWeight: "500", fontSize: "0.85rem", marginLeft: "0.5rem" }}>REQ-001</span>
-                  </h4>
-                  <p style={{ color: "#64748b", fontSize: "0.875rem", margin: "0 0 0.5rem 0" }}>
-                    Solicitud para agregar una nueva línea de bisagras de titanio para aplicaciones aeroespaciales.
-                  </p>
-                  <p style={{ color: "#94a3b8", fontSize: "0.8rem", margin: 0 }}>
-                    María González • 2026-03-20 • <span style={{ backgroundColor: "#dcfce7", color: "#166534", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: "600" }}>Agregar Producto</span>
-                  </p>
-                </div>
+            {sol.estado === 'Pendiente' && (
+              <div style={{ marginTop: '12px', display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={() => cambiarEstado(sol.id, 'Aprobada')}
+                  style={{
+                    backgroundColor: '#16a34a',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ✓ Aprobar
+                </button>
+                <button
+                  onClick={() => cambiarEstado(sol.id, 'Rechazada')}
+                  style={{
+                    backgroundColor: '#dc2626',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ✕ Rechazar
+                </button>
               </div>
-              <span style={{ backgroundColor: "#fef3c7", color: "#b45309", fontSize: "0.8rem", fontWeight: "700", padding: "0.35rem 0.75rem", borderRadius: "9999px" }}>🕒 Pendiente</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.75rem", borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
-              <button style={{ background: "none", border: "none", color: "#2563eb", fontWeight: "700", fontSize: "0.875rem", cursor: "pointer" }}>Ver detalles</button>
-              <button style={{ backgroundColor: "#16a34a", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✓ Aprobar</button>
-              <button style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✕ Rechazar</button>
-            </div>
+            )}
           </div>
-
-          {/* Solicitud 2 */}
-          <div style={{ backgroundColor: "white", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
-              <div style={{ display: "flex", gap: "1rem" }}>
-                <span style={{ backgroundColor: "#dbeafe", padding: "0.5rem", borderRadius: "8px", height: "fit-content", fontSize: "1.2rem" }}>📝</span>
-                <div>
-                  <h4 style={{ fontSize: "1.05rem", fontWeight: "800", margin: "0 0 0.35rem 0" }}>
-                    Actualizar precio buje BUJ-002 <span style={{ color: "#94a3b8", fontWeight: "500", fontSize: "0.85rem", marginLeft: "0.5rem" }}>REQ-002</span>
-                  </h4>
-                  <p style={{ color: "#64748b", fontSize: "0.875rem", margin: "0 0 0.5rem 0" }}>
-                    Actualización de precio por cambio en coste de materias primas.
-                  </p>
-                  <p style={{ color: "#94a3b8", fontSize: "0.8rem", margin: 0 }}>
-                    Carlos Ruiz • 2026-03-19 • <span style={{ backgroundColor: "#dbeafe", color: "#1e40af", padding: "0.15rem 0.5rem", borderRadius: "4px", fontWeight: "600" }}>Editar Producto</span>
-                  </p>
-                </div>
-              </div>
-              <span style={{ backgroundColor: "#fef3c7", color: "#b45309", fontSize: "0.8rem", fontWeight: "700", padding: "0.35rem 0.75rem", borderRadius: "9999px" }}>🕒 Pendiente</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.75rem", borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
-              <button style={{ background: "none", border: "none", color: "#2563eb", fontWeight: "700", fontSize: "0.875rem", cursor: "pointer" }}>Ver detalles</button>
-              <button style={{ backgroundColor: "#16a34a", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✓ Aprobar</button>
-              <button style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "0.4rem 1rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", cursor: "pointer" }}>✕ Rechazar</button>
-            </div>
-          </div>
-
-        </div>
-
-      </main>
+        ))
+      )}
     </div>
   );
-}
+};
